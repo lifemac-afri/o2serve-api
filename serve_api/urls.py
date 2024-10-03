@@ -20,11 +20,11 @@ schema_view = get_schema_view(
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', include('menu.urls')),  # Include menu item URLs
-    path('api/', include('orders.urls')),  # Include order URLs
-    path('api/', include('authentication.urls')),  # Include user URLs
-    path('api/', include('tables.urls')),  # Include user URLs
-    path('api/', include('customers.urls')),  # Include user URLs
+    path('api/', include('menu.urls')),  
+    path('api/', include('orders.urls')),  
+    path('api/', include('authentication.urls')), 
+    path('api/', include('tables.urls')), 
+    path('api/', include('customers.urls')), 
 
     # Swagger documentation URLs
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),

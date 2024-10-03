@@ -19,22 +19,26 @@ def upload_csv(request):
             # Use pandas to read the CSV file
             df = pd.read_csv(csv_file)
 
-            # Process each row in the DataFrame
             for index, row in df.iterrows():
                 category_name = row['Category']
-                drink_price = row['DRINK PRICE (GHC)']
-
-                # Create or get the category
-                category, created = Category.objects.get_or_create(name=category_name)
+                item_name = row['Item'] 
+                price = row['Price'] if pd.notna(row['Price']) else 0.0 
+                event = row['Event']
+                available = row['Availability']
+                category, created = Category.objects.get_or_create(category_name=category_name)  
+                print(f'{category.category_name} added')
 
                 # Create the menu item
-                MenuItem.objects.create(
-                    name=f"{category_name} Drink",  # You might want to customize this
-                    description=f"A drink in the {category_name} category.",
-                    price=drink_price,
-                    available=True,
-                    category=category
+                menuitem = MenuItem.objects.create(
+                    item_name=item_name,  
+                    description=f"An item in the {category_name} category.",
+                    price=float(price),
+                    availability=bool(available),  
+                    category=category,  
+                    event=bool(event)
                 )
+                
+                print(f'{menuitem.item_name} added')
 
             return JsonResponse({'message': 'Data uploaded successfully'}, status=201)
 
