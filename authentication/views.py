@@ -3,18 +3,25 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.contrib.auth import get_user_model
 from .serializers import UserSerializer
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated,AllowAny
 from drf_yasg.utils import swagger_auto_schema
 
 User = get_user_model()
 
+
 class UserListCreateView(APIView):
-    # permission_classes = [IsAuthenticated]
+    # Apply different permissions for GET and POST
+    def get_permissions(self):
+        if self.request.method == 'POST':
+            return [AllowAny()]
+        return [IsAuthenticated()]
+
     @swagger_auto_schema(responses={200: UserSerializer(many=True)})
     def get(self, request):
         users = User.objects.all()
         serializer = UserSerializer(users, many=True)
         return Response(serializer.data)
+
     @swagger_auto_schema(request_body=UserSerializer)
     def post(self, request):
         serializer = UserSerializer(data=request.data)
@@ -22,6 +29,7 @@ class UserListCreateView(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class UserDetailView(APIView):
     # permission_classes = [IsAuthenticated]
@@ -40,6 +48,7 @@ class UserDetailView(APIView):
         return Response(serializer.data)
 
     def put(self, request, pk):
+        
         user = self.get_object(pk)
         if user is None:
             return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)

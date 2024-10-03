@@ -63,16 +63,15 @@ REST_FRAMEWORK = {
 }
 
 # Swagger Configuration
-# SWAGGER_SETTINGS = {
-#     'USE_SESSION_AUTH': False,
-#     'SECURITY_DEFINITIONS': {
-#         'Bearer': {
-#             'type': 'apiKey',
-#             'name': 'Authorization',
-#             'in': 'header'
-#         }
-#     }
-# }
+SWAGGER_SETTINGS = {
+    'SECURITY_DEFINITIONS': {
+        'Bearer': {
+            'type': 'apiKey',
+            'name': 'Authorization',
+            'in': 'header',
+        }
+    },
+}
 
 # SimpleJWT settings (optional)
 from datetime import timedelta
