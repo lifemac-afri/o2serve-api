@@ -27,3 +27,8 @@ class Table(models.Model):
         img.save(buffer, 'PNG')
         self.qr_code.save(f'{self.table_number}_qr.png', File(buffer), save=False)
         super().save(*args, **kwargs)
+        
+        
+    def __str__(self):
+        return (f'table {self.table_number}')
+        

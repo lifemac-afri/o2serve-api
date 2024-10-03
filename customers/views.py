@@ -1,8 +1,8 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from .models import Customer
-from .serializers import CustomerSerializer
+from .models import Customer,ActivityLog
+from .serializers import CustomerSerializer,VerifyOTPSerializer
 from rest_framework.permissions import IsAuthenticated,AllowAny
 from drf_yasg.utils import swagger_auto_schema
 from random import randint
@@ -27,16 +27,12 @@ class CustomerListCreateView(APIView):
         if serializer.is_valid():
             # Save the customer without OTP verification first
             customer = serializer.save()
-
-            # Generate a random 6-digit OTP
-            otp = str(randint(100000, 999999))
+            otp = send_sms(phone=customer.phone_number)
             customer.otp = otp
             customer.save()
-
-            send_sms(otp=otp,phone=customer.phone_number)
-
+            ActivityLog.objects.create(activity=f"OTP -{otp} sent successfully to {customer.phone_number}")
             return Response({
-                "message": "Customer created. OTP sent to phone number.",
+                "message": f"Customer created. OTP sent to   {customer.phone_number}.",
                 "customer": serializer.data
             }, status=status.HTTP_201_CREATED)
 
@@ -45,16 +41,17 @@ class CustomerListCreateView(APIView):
 
 
 class CustomerVerifyOTPView(APIView):
-    @swagger_auto_schema(request_body=CustomerSerializer)
-    def post(self, request, pk):
+    @swagger_auto_schema(request_body=VerifyOTPSerializer)
+    def post(self, request):
+        user_id =request.data.get('user_id')
+        provided_otp = request.data.get('otp')
         
+        print(f"{user_id} has {provided_otp}")
         try:
-            customer = Customer.objects.get(pk=pk)
+            customer = Customer.objects.get(pk=user_id)
         except Customer.DoesNotExist:
             return Response({"error": "Customer not found"}, status=status.HTTP_404_NOT_FOUND)
 
-        # Verify OTP from request body
-        provided_otp = request.data.get('otp')
         if provided_otp and provided_otp == customer.otp:
             customer.is_verified = True  
             customer.save()

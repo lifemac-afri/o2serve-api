@@ -3,19 +3,23 @@ from rest_framework.response import Response
 from rest_framework import status
 from .models import MenuItem,Category
 from .serializers import MenuItemSerializer,CategorySerializer
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated,AllowAny
 from drf_yasg.utils import swagger_auto_schema
 
 class MenuItemListCreateView(APIView):
-    permission_classes = [IsAuthenticated]
+    
+    permission_classes=[AllowAny]
+    
     @swagger_auto_schema(responses={200: MenuItemSerializer(many=True)})
     def get(self, request):
         menu_items = MenuItem.objects.all()
         serializer = MenuItemSerializer(menu_items, many=True)
         return Response(serializer.data)
     
+    
     @swagger_auto_schema(request_body=MenuItemSerializer)
     def post(self, request):
+        self.permission_classes = [IsAuthenticated]
         serializer = MenuItemSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()

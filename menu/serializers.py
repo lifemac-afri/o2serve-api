@@ -7,6 +7,11 @@ class CategorySerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class MenuItemSerializer(serializers.ModelSerializer):
+    category_name = serializers.SerializerMethodField()
+
     class Meta:
         model = MenuItem
-        fields = '__all__'
+        fields = ['id', 'item_name', 'description', 'price', 'availability', 'category_name', 'event', 'created_at', 'updated_at']
+
+    def get_category_name(self, obj):
+        return obj.category.category_name

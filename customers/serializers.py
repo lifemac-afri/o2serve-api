@@ -9,5 +9,11 @@ class CustomerSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         customer = Customer.objects.create(**validated_data)
-        # Generate and send OTP logic here, if required.
         return customer
+
+
+class VerifyOTPSerializer(serializers.Serializer):
+    otp = serializers.CharField(max_length=6)
+    user_id = serializers.UUIDField()
+
+
