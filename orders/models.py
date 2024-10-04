@@ -20,7 +20,7 @@ class Order(models.Model):
 
     def save(self, *args, **kwargs):
         if self.order_number is None:
-            # Get the highest order_number and increment it
+         
             last_order = Order.objects.all().order_by('order_number').last()
             if last_order:
                 self.order_number = last_order.order_number + 1

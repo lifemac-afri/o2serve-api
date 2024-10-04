@@ -29,3 +29,24 @@ class OrderSerializer(serializers.ModelSerializer):
 
     def get_customer_name(self, obj):
         return f"{obj.customer.name}"
+
+class OrderCreateSerializer(serializers.ModelSerializer):
+    table_number = serializers.IntegerField(write_only=True)  # Accept table_number from the frontend
+
+    class Meta:
+        model = Order
+        fields = ['customer', 'status', 'table_number']  # Include table_number instead of table
+
+    def create(self, validated_data):
+        
+        table_number = validated_data.pop('table_number')
+
+        
+        try:
+            table = Table.objects.get(table_number=table_number)
+        except Table.DoesNotExist:
+            raise serializers.ValidationError(f"Table with number {table_number} does not exist.")
+
+       
+        order = Order.objects.create(table=table, **validated_data)
+        return order
