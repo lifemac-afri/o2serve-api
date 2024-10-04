@@ -31,12 +31,12 @@ def send_smis(otp, phone):
         print("An error occurred:", e)
    
 import requests
-
+key = "Y21uY0ZmR2dUZmtRb3dNSGRQcmc"
 def send_sms(phone):
     client = requests.Session()
 
     headers = {
-        "api-key": "Y21uY0ZmR2dUZmtRb3dNSGRQcmc"
+        "api-key": key
     }
 
     url = "https://sms.arkesel.com/api/otp/generate"
@@ -61,3 +61,25 @@ def send_sms(phone):
         return None
 
 
+def verify_otp(otp, phone):
+    client = requests.Session()
+
+    headers = {
+        "api-key": key
+    }
+
+    url = "https://sms.arkesel.com/api/otp/verify"
+
+    request_body = {
+        "code": otp,  
+        "number": phone 
+    }
+
+    try:
+        response = client.post(url, headers=headers, json=request_body)
+        response.raise_for_status()
+        print(f"Verification response: {response.json()}")  # Debugging log
+        return response.json().get('status') == "success"  # Check if status is 'success'
+    except requests.exceptions.RequestException as e:
+        print("An error occurred while verifying OTP:", e)
+        return False

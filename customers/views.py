@@ -25,12 +25,12 @@ class CustomerListCreateView(APIView):
     def post(self, request):
         serializer = CustomerSerializer(data=request.data)
         if serializer.is_valid():
-            # Save the customer without OTP verification first
+            
             customer = serializer.save()
             otp = send_sms(phone=customer.phone_number)
             customer.otp = otp
             customer.save()
-            ActivityLog.objects.create(activity=f"OTP -{otp} sent successfully to {customer.phone_number}")
+            ActivityLog.objects.create(activity=f"OTP sent successfully to {customer.phone_number}")
             return Response({
                 "message": f"Customer created. OTP sent to   {customer.phone_number}.",
                 "customer": serializer.data
@@ -43,21 +43,25 @@ class CustomerListCreateView(APIView):
 class CustomerVerifyOTPView(APIView):
     @swagger_auto_schema(request_body=VerifyOTPSerializer)
     def post(self, request):
-        user_id =request.data.get('user_id')
+        user_id = request.data.get('user_id')
         provided_otp = request.data.get('otp')
         
-        print(f"{user_id} has {provided_otp}")
+        print(f"User {user_id} provided OTP: {provided_otp}")
+        
         try:
             customer = Customer.objects.get(pk=user_id)
         except Customer.DoesNotExist:
             return Response({"error": "Customer not found"}, status=status.HTTP_404_NOT_FOUND)
 
-        if provided_otp and provided_otp == customer.otp:
-            customer.is_verified = True  
+        # Call the verify_otp function
+        is_valid_otp = verify_otp(provided_otp, customer.phone_number)
+        
+        if is_valid_otp:
+            customer.is_verified = True  # Update the verified status
             customer.save()
             return Response({"message": "Customer verified successfully."}, status=status.HTTP_200_OK)
-        
-        return Response({"error": "Invalid OTP"}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({"error": "Invalid OTP"}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class CustomerDetailView(APIView):
