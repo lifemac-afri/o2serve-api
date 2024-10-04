@@ -19,7 +19,7 @@ class Table(models.Model):
             box_size=10,
             border=4,
         )
-        qr.add_data(f'http://yourdomain.com/?table={self.id}/')
+        qr.add_data(f'http://192.168.8.151:5173/qrcode?table={self.table_number}/')
         qr.make(fit=True)
 
         img = qr.make_image(fill='black', back_color='white')
