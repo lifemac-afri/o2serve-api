@@ -28,4 +28,4 @@ class OrderSerializer(serializers.ModelSerializer):
         return obj.table.table_number
 
     def get_customer_name(self, obj):
-        return f"{obj.customer.first_name} {obj.customer.last_name}"
+        return f"{obj.customer.name}"
