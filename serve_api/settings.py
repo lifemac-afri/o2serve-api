@@ -171,8 +171,8 @@ UNFOLD = {
     "SITE_URL": "/",
 
     "SITE_ICON": {
-        "light": lambda request: static("logo.png"),  # light mode
-        "dark": lambda request: static("logo.png"),  # dark mode
+        "light": lambda request: static("logo.png"),
+        "dark": lambda request: static("logo.png"),  
     },  
     
     "SITE_SYMBOL": "speed",  
