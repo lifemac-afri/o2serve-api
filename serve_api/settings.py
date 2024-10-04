@@ -184,10 +184,7 @@ UNFOLD = {
             "href": lambda request: static("logo.png"),
         },
     ],
-    "LOGIN": {
-        "image": lambda request: static("logo.png"),
-      
-    },
+   
      "SIDEBAR": {
         "show_search": False,
      }

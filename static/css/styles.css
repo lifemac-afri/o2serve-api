@@ -3,15 +3,3 @@ form#changelist-form .actions button[type="submit"] {
     display: inline-block !important; /* Change to block or inline-block as needed */
 }
 
-
-.bg-cover {
-    border-radius: 50%; /* Makes the element circular */
-    overflow: hidden; /* Hides any overflow from the circular shape */
-    width: 100px; /* Set width for the circular element */
-    height: 100px; /* Set height for the circular element */
-    background-size: cover; /* Ensures the image covers the entire area */
-    background-position: center; /* Centers the background image */
-    border: 5px solid #fff; /* Adds a white border around the circle */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Adds a shadow for depth */
-    margin-bottom: 1.5rem; /* Adds space below the image */
-}
