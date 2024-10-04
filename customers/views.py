@@ -6,7 +6,7 @@ from .serializers import CustomerSerializer,VerifyOTPSerializer
 from rest_framework.permissions import IsAuthenticated,AllowAny
 from drf_yasg.utils import swagger_auto_schema
 from random import randint
-from .messenger import send_sms
+from .messenger import send_sms, verify_otp
 
 
 class CustomerListCreateView(APIView):
