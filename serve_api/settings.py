@@ -174,6 +174,26 @@ UNFOLD = {
         "light": lambda request: static("logo.png"),  # light mode
         "dark": lambda request: static("logo.png"),  # dark mode
     },  
+    
+    "SITE_SYMBOL": "speed",  
+    "SITE_FAVICONS": [
+        {
+            "rel": "icon",
+            "sizes": "32x32",
+            "type": "image/png",
+            "href": lambda request: static("logo.png"),
+        },
+    ],
+    "LOGIN": {
+        "image": lambda request: static("logo.png"),
+      
+    },
+     "SIDEBAR": {
+        "show_search": False,
+     }
+     , "STYLES": [
+        lambda request: static("css/styles.css"),
+    ],
 }
 
 # CORS settings
