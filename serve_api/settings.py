@@ -207,6 +207,6 @@ CORS_ALLOW_ALL_ORIGINS = True
 ASGI_APPLICATION = 'serve_api.asgi.application'
 CHANNEL_LAYERS = {
     "default": {
-        "BACKEND": "channels.layers.InMemoryChannelLayer",  # In-memory for development
+        "BACKEND": "channels.layers.InMemoryChannelLayer",  
     }
 }
