@@ -8,7 +8,7 @@ from asgiref.sync import async_to_sync
 @receiver(post_save, sender=Order)
 def order_created(sender, instance, created, **kwargs):
     if created:
-        # Notify when a new order is created
+        print(f"order {instance.id } created")
         channel_layer = get_channel_layer()
         async_to_sync(channel_layer.group_send)(
             "orders_notifications",  # This is the channel group name

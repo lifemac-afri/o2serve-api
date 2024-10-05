@@ -3,20 +3,22 @@ from rest_framework.response import Response
 from rest_framework import status
 from .models import Order
 from .serializers import OrderSerializer, OrderCreateSerializer
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated,AllowAny
 from drf_yasg.utils import swagger_auto_schema
 
 class OrderListCreateView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
 
     @swagger_auto_schema(responses={200: OrderSerializer(many=True)})
     def get(self, request):
+        self.permission_classes = [IsAuthenticated]
         orders = Order.objects.all()
         serializer = OrderSerializer(orders, many=True)
         return Response(serializer.data)
 
     @swagger_auto_schema(request_body=OrderCreateSerializer)
     def post(self, request):
+        self.permission_classes = [AllowAny]
         serializer = OrderCreateSerializer(data=request.data)
         if serializer.is_valid():
             order = serializer.save()
