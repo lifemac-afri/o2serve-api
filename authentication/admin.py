@@ -22,6 +22,8 @@ class UserAdmin(BaseUserAdmin):
     
     # Add actions for managing users
     actions = ['make_admin', 'make_waiter', 'make_superadmin', 'delete_selected_users']
+    
+    exclude = ('created_at',)
 
     def make_admin(self, request, queryset):
         # Mark selected users as Admin

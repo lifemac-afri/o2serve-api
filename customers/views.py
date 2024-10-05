@@ -27,10 +27,12 @@ class CustomerListCreateView(APIView):
         if serializer.is_valid():
             
             customer = serializer.save()
-            otp = send_sms(phone=customer.phone_number)
+            # otp = send_sms(phone=customer.phone_number)
+            otp = 0000
+            
             customer.otp = otp
             customer.save()
-            ActivityLog.objects.create(activity=f"OTP sent successfully to {customer.phone_number}")
+        
             return Response({
                 "message": f"Customer created. OTP sent to   {customer.phone_number}.",
                 "customer": serializer.data

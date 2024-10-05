@@ -19,7 +19,7 @@ class Table(models.Model):
             box_size=10,
             border=4,
         )
-        qr.add_data(f'http://192.168.8.151:5173/qrcode?table={self.table_number}/')
+        qr.add_data(f'https://o2city-serve.vercel.app/qrcode?table={self.table_number}')
         qr.make(fit=True)
 
         img = qr.make_image(fill='black', back_color='white')

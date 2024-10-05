@@ -35,6 +35,7 @@ ALLOWED_HOSTS = ['0.0.0.0', '127.0.0.1','13.61.34.196','192.168.8.10']
 
 INSTALLED_APPS = [
     "unfold",
+    'channels',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -202,3 +203,10 @@ UNFOLD = {
 
 # Optionally, allow all origins (not recommended for production)
 CORS_ALLOW_ALL_ORIGINS = True
+
+ASGI_APPLICATION = 'serve_api.asgi.application'
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer",  # In-memory for development
+    }
+}
