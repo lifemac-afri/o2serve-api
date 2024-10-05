@@ -107,3 +107,24 @@ class CategoryDetailView(APIView):
             return Response({"error": "Category not found"}, status=status.HTTP_404_NOT_FOUND)
         category.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+    
+    
+class CustomerMenuItemListView(APIView):
+    
+    permission_classes=[AllowAny]
+    
+    @swagger_auto_schema(responses={200: MenuItemSerializer(many=True)})
+    def get(self, request):
+        self.permission_classes = [AllowAny]
+        menu_items = MenuItem.objects.all()
+        serializer = MenuItemSerializer(menu_items, many=True)
+        return Response(serializer.data)
+    
+class CustomerCategoryListView(APIView):
+    permission_classes = [AllowAny]
+    @swagger_auto_schema(responses={200: CategorySerializer(many=True)})
+    def get(self, request):
+        self.permission_classes = [AllowAny]
+        categories = Category.objects.all()
+        serializer = CategorySerializer(categories, many=True)
+        return Response(serializer.data)

@@ -17,13 +17,12 @@ class UserAdmin(BaseUserAdmin):
         (None, {'fields': ('username', 'email', 'password')}),
         ('Personal info', {'fields': ('first_name', 'last_name', 'role')}),
         ('Permissions', {'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')}),
-        ('Important dates', {'fields': ('last_login', 'created_at', 'updated_at')}),
+        
     )
     
     # Add actions for managing users
     actions = ['make_admin', 'make_waiter', 'make_superadmin', 'delete_selected_users']
-    
-    exclude = ('created_at',)
+
 
     def make_admin(self, request, queryset):
         # Mark selected users as Admin
