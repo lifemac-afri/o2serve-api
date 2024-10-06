@@ -6,13 +6,21 @@ from menu.models import MenuItem
 
 class OrderItemSerializer(serializers.ModelSerializer):
     menu_item_name = serializers.SerializerMethodField()
+    menu_item_price = serializers.SerializerMethodField()
+    subtotal = serializers.SerializerMethodField()  # Add subtotal field
 
     class Meta:
-        model = OrderItem
-        fields = ['menu_item_name', 'quantity']
+        model = OrderItem 
+        fields = ['menu_item_name', 'quantity', 'menu_item_price', 'subtotal']  # Include subtotal in fields
 
     def get_menu_item_name(self, obj):
         return obj.menu_item.item_name
+    
+    def get_menu_item_price(self, obj):
+        return obj.menu_item.price
+
+    def get_subtotal(self, obj):
+        return obj.menu_item.price * obj.quantity  # Calculate subtotal
 
 class OrderSerializer(serializers.ModelSerializer):
     table_number = serializers.SerializerMethodField()
