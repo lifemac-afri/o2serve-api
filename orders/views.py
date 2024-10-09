@@ -5,7 +5,7 @@ from .models import Order
 from .serializers import OrderSerializer, OrderCreateSerializer
 from rest_framework.permissions import IsAuthenticated,AllowAny
 from drf_yasg.utils import swagger_auto_schema
-
+from notifications_service.notify import notify_new_order
 class OrderListCreateView(APIView):
     permission_classes = [AllowAny]
 
@@ -23,6 +23,7 @@ class OrderListCreateView(APIView):
         if serializer.is_valid():
             order = serializer.save()
             response_serializer = OrderSerializer(order)
+            notify_new_order(response_serializer.data)
             return Response(response_serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

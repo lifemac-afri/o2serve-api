@@ -27,8 +27,8 @@ SECRET_KEY = 'django-insecure-m-rdbnevhf^k&q!t21o4@g%y8k3wc+601e_&5^wza&e_%#@s0w
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-
-ALLOWED_HOSTS = ['0.0.0.0', '127.0.0.1','13.61.34.196','192.168.8.10','13.61.8.225']
+WHITENOISE_AUTOREFRESH = True
+ALLOWED_HOSTS = ['0.0.0.0', '127.0.0.1','13.61.34.196','192.168.8.169','13.61.8.225']
 
 
 # Application definition
@@ -203,10 +203,3 @@ UNFOLD = {
 
 # Optionally, allow all origins (not recommended for production)
 CORS_ALLOW_ALL_ORIGINS = True
-
-ASGI_APPLICATION = 'serve_api.asgi.application'
-CHANNEL_LAYERS = {
-    "default": {
-        "BACKEND": "channels.layers.InMemoryChannelLayer",  # In-memory for development
-    }
-}

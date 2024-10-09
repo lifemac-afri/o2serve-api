@@ -3,7 +3,8 @@ from .models import Order, OrderItem
 from tables.models import Table
 from customers.models import Customer
 from menu.models import MenuItem
-
+from authentication.models import User
+from notifications_service.notify import notify_order_accepted,notify_order_assigned,notify_order_updated
 class OrderItemSerializer(serializers.ModelSerializer):
     menu_item_name = serializers.SerializerMethodField()
     menu_item_price = serializers.SerializerMethodField()
@@ -20,17 +21,19 @@ class OrderItemSerializer(serializers.ModelSerializer):
         return obj.menu_item.price
 
     def get_subtotal(self, obj):
-        return obj.menu_item.price * obj.quantity  # Calculate subtotal
+        return obj.menu_item.price * obj.quantity  
 
 class OrderSerializer(serializers.ModelSerializer):
     table_number = serializers.SerializerMethodField()
     customer_name = serializers.SerializerMethodField()
     items = OrderItemSerializer(many=True, read_only=True)
     total_amount = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
+    accepted_status = serializers.BooleanField(required=False)  # New field for acceptance status
+    assigned_user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), required=False, allow_null=True)  # New field for assigned user
 
     class Meta:
         model = Order
-        fields = ['id', 'order_number', 'table_number', 'customer_name', 'status', 'total_amount', 'order_date', 'items']
+        fields = ['id', 'order_number', 'table_number', 'customer_name', 'status', 'total_amount', 'order_date', 'items', 'accepted_status', 'assigned_user']
 
     def get_table_number(self, obj):
         return obj.table.table_number
@@ -38,49 +41,22 @@ class OrderSerializer(serializers.ModelSerializer):
     def get_customer_name(self, obj):
         return f"{obj.customer.name}"
 
-class OrderCreateSerializer(serializers.ModelSerializer):
-    table_number = serializers.IntegerField(write_only=True)  # Accept table_number from the frontend
-    customer = serializers.PrimaryKeyRelatedField(queryset=Customer.objects.all())  # Expect customer ID
+    def update(self, instance, validated_data):
+        accepted_status = validated_data.get('accepted_status', instance.accepted_status)
+        assigned_user = validated_data.get('assigned_user', instance.assigned_user)
 
-    class Meta:
-        model = Order
-        fields = ['customer', 'status', 'table_number']  # Include table_number instead of table
+        if not instance.accepted_status and accepted_status:
+            notify_order_accepted(order_id=instance.order_number)
 
-    def create(self, validated_data):
-        # Extract table_number and retrieve the Table object
-        table_number = validated_data.pop('table_number')
-        try:
-            table = Table.objects.get(table_number=table_number)
-        except Table.DoesNotExist:
-            raise serializers.ValidationError(f"Table with number {table_number} does not exist.")
+        if assigned_user and instance.assigned_user != assigned_user:
+            notify_order_assigned(order_id=instance.order_number, assignee= instance.assigned_user)
 
-        # Create the order with the table and the rest of the validated data
-        order = Order.objects.create(table=table, **validated_data)
-        return order
+        instance.accepted_status = accepted_status
+        instance.assigned_user = assigned_user
 
-    table_number = serializers.IntegerField(write_only=True)  
+        instance.save()
+        return instance
 
-    class Meta:
-        model = Order
-        fields = ['customer', 'status', 'table_number']  
-
-    def create(self, validated_data):
-        
-        table_number = validated_data.pop('table_number')
-        customer_id = validated_data.pop('customer')
-
-        print(f"customer id is :{customer_id}")
-        
-        try:
-            table = Table.objects.get(table_number=table_number)
-            customer = Customer.objects.get(phone_number=customer_id)
-        except Table.DoesNotExist:
-            raise serializers.ValidationError(f"Table with number {table_number} does not exist.")
-
-       
-        order = Order.objects.create(table=table, customer=customer, **validated_data)
-        return order
-    
 
 class OrderItemCreateSerializer(serializers.ModelSerializer):
     item_id = serializers.UUIDField(write_only=True)  # Accepts UUID for the menu item
