@@ -25,6 +25,7 @@ def upload_csv(request):
                 price = row['Price'] if pd.notna(row['Price']) else 0.0 
                 event = row['Event']
                 available = row['Availability']
+                quantity = row["Quantity"]
                 category, created = Category.objects.get_or_create(category_name=category_name)  
                 print(f'{category.category_name} added')
 
@@ -35,6 +36,7 @@ def upload_csv(request):
                     price=float(price),
                     availability=bool(available),  
                     category=category,  
+                    quantity = quantity,
                     event=bool(event)
                 )
                 

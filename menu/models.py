@@ -19,6 +19,7 @@ class MenuItem(models.Model):
     availability = models.BooleanField(default=True)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     event = models.BooleanField(default=False)
+    quantity = models.PositiveIntegerField(default=50)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
