@@ -1,5 +1,0 @@
-/* Custom CSS to show the "Run" button */
-form#changelist-form .actions button[type="submit"] {
-    display: inline-block !important; /* Change to block or inline-block as needed */
-}
-

@@ -3,4 +3,5 @@ db.sqlite3
 */migrations/*.py
 */migrations/*.pyc
 !*/migrations/__init__.py
+static
 
