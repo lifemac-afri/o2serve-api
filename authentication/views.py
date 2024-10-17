@@ -6,6 +6,7 @@ from .serializers import UserSerializer,UserLoginSerializer
 from rest_framework.permissions import IsAuthenticated,AllowAny
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework_simplejwt.tokens import RefreshToken
+from .models import User, Worker
 User = get_user_model()
 
 
@@ -38,9 +39,13 @@ class UserLoginView(APIView):
         serializer = UserLoginSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.validated_data['user']
+            user = User.objects.get(username=user)
+            if user.role == 'waiter':
+                user.is_logged_in = True
+                user.save()
+                Worker.objects.get_or_create(user=user)
+                
             user_serializer = UserSerializer(user)
-            
-            # Generate JWT tokens
             refresh = RefreshToken.for_user(user)
             
             return Response({
@@ -85,3 +90,24 @@ class UserDetailView(APIView):
             return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
         user.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class WorkerLogoutView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        user = request.user
+        if user.role != 'waiter':
+            return Response({"error": "Only waiters can log out as workers"}, status=status.HTTP_403_FORBIDDEN)
+        
+        user.is_logged_in = False
+        user.save()
+        return Response({"message": "Worker logged out successfully"}, status=status.HTTP_200_OK)
+
+class WorkerListView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        workers = User.objects.filter(role='waiter', is_logged_in=True)
+        serializer = UserSerializer(workers, many=True)
+        return Response(serializer.data)

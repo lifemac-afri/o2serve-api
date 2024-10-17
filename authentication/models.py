@@ -11,12 +11,17 @@ class User(AbstractUser):
     groups = models.ManyToManyField(
         Group,
         related_name='custom_user_set',  # Change this to a unique name
-        blank=True,
-    )
+        blank=True)
     user_permissions = models.ManyToManyField(
         Permission,
         related_name='custom_user_permissions_set',  # Change this to a unique name
         blank=True,
     )
+    is_logged_in = models.BooleanField(default=False)
 
+class Worker(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='worker')
+    last_order_assigned = models.DateTimeField(null=True, blank=True)
 
+    def __str__(self):
+        return self.user.username
