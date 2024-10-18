@@ -14,9 +14,13 @@ class OrderListCreateView(APIView):
     @swagger_auto_schema(responses={200: OrderSerializer(many=True)})
     def get(self, request):
         self.permission_classes = [IsAuthenticated]
-        orders = Order.objects.all().order_by('-created_at')  # Sort by created_at in descending order
-        serializer = OrderSerializer(orders, many=True)
-        return Response(serializer.data)
+        try:
+            orders = Order.objects.all().order_by('-created_at')
+            serializer = OrderSerializer(orders, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Exception as e:
+            print(f"error {e}")
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     @swagger_auto_schema(request_body=OrderCreateSerializer)
     def post(self, request):

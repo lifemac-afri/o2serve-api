@@ -17,3 +17,7 @@ class VerifyOTPSerializer(serializers.Serializer):
     user_id = serializers.UUIDField()
 
 
+
+class CustomerOrderUpdateSerializer(serializers.Serializer):
+    id = serializers.CharField()
+    served = serializers.BooleanField(required=False)

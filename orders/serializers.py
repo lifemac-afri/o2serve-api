@@ -30,8 +30,8 @@ class OrderSerializer(serializers.ModelSerializer):
     total_amount = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
     accepted_status = serializers.BooleanField(required=False)
     assigned_waiter = serializers.SerializerMethodField()
-    # assigned_waiter = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), required=False, allow_null=True)
     served = serializers.BooleanField()
+    id = serializers.UUIDField(format='hex')
 
     class Meta:
         model = Order
@@ -49,33 +49,20 @@ class OrderSerializer(serializers.ModelSerializer):
             'served'
         ]
 
-    
     def get_table_number(self, obj):
-        return obj.table.table_number
+        return obj.table.table_number if obj.table else None
 
     def get_customer_name(self, obj):
-        return obj.customer.name
+        return obj.customer.name if obj.customer else None
     
     def get_assigned_waiter(self, obj):
-        return obj.assigned_waiter.username
+        return obj.assigned_waiter.username if obj.assigned_waiter else None
 
-    def update(self, instance, validated_data):
-        # Update fields as needed
-        instance.accepted_status = validated_data.get('accepted_status', instance.accepted_status)
-        new_assigned_waiter = validated_data.get('assigned_waiter', instance.assigned_waiter)
-        
-        # Check if the assigned waiter has changed
-        if new_assigned_waiter and instance.assigned_waiter != new_assigned_waiter:
-            notify_order_assigned(order_id=instance.order_number, assignee=new_assigned_waiter.username)
-            instance.assigned_waiter = new_assigned_waiter
-
-        # Update the served status
-        instance.served = validated_data.get('served', instance.served)
-
-        # Save the updated instance
-        instance.save()
-
-        return instance
+    def to_representation(self, instance):
+        try:
+            return super().to_representation(instance)
+        except Exception as e:
+            raise serializers.ValidationError(f"Error serializing order: {str(e)}")
 
 class OrderItemCreateSerializer(serializers.ModelSerializer):
     item_id = serializers.UUIDField(write_only=True)  # Accepts UUID for the menu item

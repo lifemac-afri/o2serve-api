@@ -2,11 +2,12 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from .models import Customer,ActivityLog
-from .serializers import CustomerSerializer,VerifyOTPSerializer
+from .serializers import CustomerSerializer,VerifyOTPSerializer,CustomerOrderUpdateSerializer
 from rest_framework.permissions import IsAuthenticated,AllowAny
 from drf_yasg.utils import swagger_auto_schema
 from random import randint
 from .messenger import send_sms, verify_otp
+from orders.models import Order
 
 
 class CustomerListCreateView(APIView):
@@ -98,3 +99,27 @@ class CustomerDetailView(APIView):
             return Response({"error": "Customer not found"}, status=status.HTTP_404_NOT_FOUND)
         customer.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class CustomerOrderUpdateView(APIView):
+    permission_classes = [AllowAny]
+
+    @swagger_auto_schema(request_body=CustomerOrderUpdateSerializer)
+    def put(self, request):
+        print(request.data)
+        serializer = CustomerOrderUpdateSerializer(data=request.data)
+        if serializer.is_valid():
+            id = serializer.validated_data['id']
+            print(id)
+            try:
+                order = Order.objects.get(id=id)
+                print(order)
+            except Order.DoesNotExist:
+                return Response({"error": "Order not found"}, status=status.HTTP_404_NOT_FOUND)
+
+            if 'served' in serializer.validated_data:
+                order.served = serializer.validated_data['served']
+            order.save()
+
+            return Response({"message": "Order updated successfully"}, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
