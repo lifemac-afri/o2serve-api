@@ -44,11 +44,12 @@ class OrderDetailView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get_object(self, pk):
+        print(f"pk {pk}")
         try:
             return Order.objects.get(pk=pk)
         except Order.DoesNotExist:
             return None
-
+    
     def get(self, request, pk):
         order = self.get_object(pk)
         if order is None:
